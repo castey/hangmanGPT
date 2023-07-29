@@ -6,6 +6,8 @@ const statusDisplay = document.getElementById('status-display');
 const incorrectGuessDisplay = document.getElementById('incorrect-guess-display');
 const categoryDisplay = document.getElementById('category-display');
 const sendGuessButton = document.getElementById('send-guess');
+let gameInProgress = false;
+let doubleCheck = false;
 
 // detect enter key event
 guessInput.addEventListener('keyup', (event) => {
@@ -16,13 +18,27 @@ guessInput.addEventListener('keyup', (event) => {
 
 // detect click event
 sendGuessButton.addEventListener('click', () => {
+
   if (guessInput.value.length === 0) {
-    statusDisplay.innerText = '';
-    incorrectGuessDisplay.innerText = '';
-    sendGuessButton.innerText = 'Submit Guess';
+    if (gameInProgress == true && doubleCheck == false) {
+      doubleCheck = true;
+      statusDisplay.innerText = "New game? Press enter again"
+    }
+    else {
+      statusDisplay.innerText = '';
+      incorrectGuessDisplay.innerText = '';
+      sendGuessButton.innerText = 'Submit Guess';
+      doubleCheck = false;
+      socket.emit('send-guess', guessInput.value);
+    }
   }
 
-  socket.emit('send-guess', guessInput.value);
+  else {
+    statusDisplay.innerText = '';
+    doubleCheck = false;
+    socket.emit('send-guess', guessInput.value);
+  }
+
   guessInput.value = '';
 });
 
@@ -40,6 +56,8 @@ socket.on('game-over', (data) => {
     statusDisplay.innerText = 'You lost!';
     sendGuessButton.innerText = 'New Game';
   }
+  gameInProgress = false;
+  guessInput.placeholder = "Press enter to start new";
 });
 
 // handle incorrect letter guesses
@@ -55,6 +73,8 @@ socket.on('incorrect-word-guess', (data) => {
 // display the category
 socket.on('category', (data) => {
   categoryDisplay.innerText = 'Category: ' + data;
+  guessInput.placeholder = "Guess a letter or phrase";
+  gameInProgress = true;
 });
 
 // update the submit button
