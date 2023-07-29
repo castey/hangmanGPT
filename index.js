@@ -1,3 +1,4 @@
+// declare dependencies
 require('dotenv').config();
 const express = require('express');
 const http = require('http');
@@ -8,11 +9,13 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
+// create OpenAI configuration
 const configuration = new Configuration({
     apiKey: myKey,
 });
 const openai = new OpenAIApi(configuration);
 
+// declare function to prompt OpenAI
 async function newWord(prompt) {
     const response = await openai.createCompletion({
         model: "text-davinci-003",
@@ -24,9 +27,13 @@ async function newWord(prompt) {
     return response.data.choices[0].text;
 }
 
+// serve public folder
 app.use(express.static('public'));
+
+// parse json requests
 app.use(express.json());
 
+// delcare categories array
 let categories = [
     "Before and After", "Song Lyrics", "On the Map", "Living Things", "What Are You Doing?", "Food & Drink", "Same Letter", "Rhyme Time",
     "Historical Events", "Famous People", "Science Terms", "Literary Characters", "Movie Titles", "Sports Teams", "City Landmarks", "Popular TV Shows",
@@ -43,41 +50,57 @@ let categories = [
     "Architectural Styles", "Cryptography", "Fossils", "Types of Ships", "Constellations", "Types of Fabric", "Periodic Table Elements", "Famous Explorers"
 ];
 
+// pick the character to hide unguessed letters
 const rChar = "-"
 
+// on user connection
 io.on('connection', (socket) => {
+
+    // declare game state variables 
     let hangmanStarted = false;
-    let hangWord = '';
+    let hangPhrase = '';
     let hangBlank = '';
     let wrongLetters = [];
     let guessedLetters = [];
     let category = '';
 
+    // handle user input
     socket.on('send-guess', (userGuess) => {
 
+        // trim user input and format to lower case
         userGuess = userGuess.toLowerCase().trim();
-        //start a new game
+
+        //start a new game if user enters nothing
         if (userGuess.length == 0) {
+
+            // start game state variables
             hangmanStarted = true;
-            category = categories[Math.floor(Math.random() * categories.length)];
             wrongLetters = [];
             guessedLetters = [];
 
+            // pick a random category
+            category = categories[Math.floor(Math.random() * categories.length)];
+
+            // generate phrase using OpenAI
             newWord(`Generate a challenging yet realistic phrase for a game of Hangman, using words related to the category '${category}'. The phrase should be composed of valid English words, separated by spaces. No nonsense words. For instance, if the category was 'music', a suitable output might be 'JAZZ QUARTET PERFORMANCE'`).then((ret) => {
                 if (!ret) throw new Error("OpenAI error")
 
-                hangWord = ret;
-                hangWord = hangWord.replace(/[^a-zA-Z ]/g, "").toLowerCase().trim();
-                hangBlank = hangWord.replace(/[^ ]/g, rChar);
+                // format the phrase to lowercase, replace non letters and duplicate/trailing spaces
+                hangPhrase = ret.toLowerCase().replace(/[^a-z ]+| {2,}/g, " ").trim();
 
-                console.log(hangWord);
+                // replace all letters in the phrase to the hidden character to generate clue
+                hangBlank = hangPhrase.replace(/[^ ]/g, rChar);
 
+                // in case you want to keep track of words/phrases
+                console.log(hangPhrase);
+
+                // send clue and category to client
                 socket.emit('update-character', hangBlank);
                 socket.emit('category', category);
 
-              }).catch((err) => {
+            }).catch((err) => {
                 console.error(err);
-              });
+            });
 
         }
 
@@ -85,61 +108,70 @@ io.on('connection', (socket) => {
         else if (userGuess.length == 1) {
 
             //check if the guess is repeated
-            if(guessedLetters.includes(userGuess.toLowerCase()) || wrongLetters.includes(userGuess.toLowerCase())) {
+            if (guessedLetters.includes(userGuess) || wrongLetters.includes(userGuess)) {
                 socket.emit('repeated-guess', userGuess);
             }
             //if user guesses a letter correctly and letter has not been guessed
-            else if(hangWord.includes(userGuess)){
+            else if (hangPhrase.includes(userGuess)) {
 
                 //add letter to guessed letters array
-                guessedLetters.push(userGuess.toLowerCase());
+                guessedLetters.push(userGuess);
 
                 //remove dashes for every guessed letter
                 let regexStr = `[^ ${guessedLetters.join('')}]`;
                 let regex = new RegExp(regexStr, 'g');
 
                 //replace the displayed word with the guesses filled in
-                hangBlank = hangWord.replace(regex, rChar);
+                hangBlank = hangPhrase.replace(regex, rChar);
 
                 socket.emit('update-character', hangBlank);
-            } 
+            }
             //if user guesses a letter incorrectly
             else {
-                wrongLetters.push(userGuess.toLowerCase());
+                
+                // add guess to list of wrong letters guessed
+                wrongLetters.push(userGuess);
                 socket.emit('incorrect-guess', userGuess);
 
                 // Check if user has guessed wrong 7 times
-                if(wrongLetters.length >= 7) {
-                    socket.emit('game-over', {result: 'lose'});
-                    hangmanStarted = false; // Ensure the game is flagged as ended
+                if (wrongLetters.length >= 7) {
+
+                    // send loss event
+                    socket.emit('game-over', { result: 'lose' });
 
                     // Reset game state
+                    hangmanStarted = false; 
                     wrongLetters = [];
                     guessedLetters = [];
-                    hangWord = '';
+                    hangPhrase = '';
                     hangBlank = '';
                 }
             }
-        } 
+        }
+
+        // handle full phrase gueses
         else if (userGuess.length > 1) {
-            if (userGuess.toLowerCase() === hangWord) {
-              hangmanStarted = false;
 
-              wrongLetters = [];
-              guessedLetters = [];
+            // check if guess matches the phrase
+            if (userGuess.toLowerCase() === hangPhrase) {
 
-              hangBlank = hangWord; // The guess is correct so the blank will now be filled with the complete word.
-              
-              socket.emit('update-character', hangBlank); // Emit the updated hangBlank.
+                // reset game state 
+                hangmanStarted = false;
+                wrongLetters = [];
+                guessedLetters = [];
+                hangBlank = hangPhrase; // The guess is correct so the blank will now be filled with the complete word.
 
-              // Emit another event here to indicate that the game has ended.
-              socket.emit('game-over', {result: 'win'});
+                // Emit the updated hangBlank.
+                socket.emit('update-character', hangBlank); 
 
-              // Reset game state
-              wrongLetters = [];
-              guessedLetters = [];
-              hangWord = '';
-              hangBlank = '';
+                // Emit another event here to indicate that the game has ended.
+                socket.emit('game-over', { result: 'win' });
+
+                // Reset game state
+                wrongLetters = [];
+                guessedLetters = [];
+                hangPhrase = '';
+                hangBlank = '';
             } else {
                 // If guess is incorrect, you might want to emit an event.
                 socket.emit('incorrect-word-guess', userGuess);
