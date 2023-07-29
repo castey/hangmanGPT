@@ -19,11 +19,16 @@ guessInput.addEventListener('keyup', (event) => {
 // detect click event
 sendGuessButton.addEventListener('click', () => {
 
+  // handle empty inputs
   if (guessInput.value.length === 0) {
+
+    // if game in progress and enter pressed once
     if (gameInProgress == true && doubleCheck == false) {
       doubleCheck = true;
       statusDisplay.innerText = "New game? Press enter again"
     }
+
+    // if no game in progress or if ready for final enter
     else {
       statusDisplay.innerText = '';
       incorrectGuessDisplay.innerText = '';
@@ -33,12 +38,17 @@ sendGuessButton.addEventListener('click', () => {
     }
   }
 
-  else {
+  // send guess if game in progress
+  else if (gameInProgress == true){
     statusDisplay.innerText = '';
     doubleCheck = false;
     socket.emit('send-guess', guessInput.value);
   }
 
+  // start new game if no game in progress
+  else{
+    socket.emit('send-guess', '');
+  }
   guessInput.value = '';
 });
 
