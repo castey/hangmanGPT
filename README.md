@@ -1,18 +1,17 @@
 # Hangman Game with OpenAI and Socket.IO
 ## Overview
-This is a simple and interactive Hangman game where the server generates words for the game using OpenAI's API. The game is served over an Express server and uses Socket.IO for real-time, bidirectional and event-based communication.
+This is a simple and interactive Hangman game where the server generates a phrase for the game using OpenAI's API. The game is served over an Express server and uses Socket.IO for real-time, bidirectional and event-based communication.
 
-The game can be played directly in the browser. The user guesses the letters or the entire word or phrase, and the game provides real-time feedback about the guesses.
+The game can be played directly in the browser. The user guesses the letters or the entire phrase, and the game provides real-time feedback about the guesses.
 
 ## Features
--Random word or phrase generation for each new game
+-Random phrase generation for each new game using GPT-3
 
 -Dynamic interface that updates the game status in real-time
 
--Single letter or complete word guessing
+-Single letter or complete phrase guessing
 
 -Indication of game status and end of game
-
 
 ## Installation
 To get started, clone the repository and install the dependencies.
@@ -24,6 +23,7 @@ npm install`
 Create a .env file in the root directory and add your OpenAI API key.
 
 `API_KEY=your_openai_api_key`
+
 ## Usage
 To start the server, run:
 
@@ -33,11 +33,11 @@ The server runs on port 3000 by default (or any port specified in your environme
 You can start a new game or make a guess by typing into the input field and pressing Enter or clicking on the Submit Guess/New Game button. If the input field is empty and you press Enter or click the button, a new game will start. If you've typed something into the field, it will be submitted as a guess.
 
 ## Game Rules
-The game randomly selects a word or phrase related to a certain category.
-The game starts once the player makes a guess or requests a new game.
-The player can guess one letter at a time, or attempt to guess the entire word or phrase.
-The game keeps track of incorrect guesses and displays them to the player.
-The game ends if the player successfully guesses the word or phrase, or if the player makes seven incorrect guesses.
+Randomly selects a phrase related to a certain category.
+A new game can be started at any time
+The player can guess one letter at a time, or attempt to guess the entire phrase.
+Keeps track of incorrect guesses and displays them to the player.
+Game ends if the player successfully guesses the phrase, or if the player makes seven incorrect guesses.
 
 ## Dependencies
 -Express
