@@ -59,6 +59,7 @@ html, body {
 .top-bar {
   background-color: #02c2b0;
   position: fixed; 
+  top: 0; /* positions the bar at the very top */
   width: 100%;
   height: 50px; 
   display: flex;
@@ -75,7 +76,7 @@ html, body {
 }
 
 .source-link:hover {
-  color: #fff; /* darker blue when hovering */
+  color: #fff; /* color when hovering */
   text-decoration: underline; /* underline when hovering */
-  font-weight: bold; /* makes the text bold */
+  font-weight: bold; /* makes the text bold when hovering */
 }
