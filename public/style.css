@@ -13,33 +13,36 @@ html, body {
 }
 
 .status {
-  font-size: 36px;
+  font-size: 2.25em;
   margin-bottom: 20px;
   color: #ff0000;
 }
 
 .character {
-  font-size: 48px;
+  font-size: 3em;
   margin-bottom: 20px;
 }
 
 #guess-input {
-  font-size: 24px;
+  font-size: 1.5em;
   padding: 10px;
-  width: 300px;
+  width: 80%;
+  max-width: 300px;
   border-radius: 5px;
   border: none;
   margin-bottom: 10px;
 }
 
 #send-guess {
-  font-size: 24px;
+  font-size: 1.5em;
   padding: 10px 20px;
   border-radius: 5px;
   border: none;
   background-color: #009688;
   color: #ffffff;
   cursor: pointer;
+  width: 80%;
+  max-width: 300px;
 }
 
 #send-guess:hover {
@@ -47,36 +50,63 @@ html, body {
 }
 
 .incorrect-guesses {
-  font-size: 24px;
+  font-size: 1.5em;
   margin-top: 20px;
   color: #000000;
 }
+
 .category {
-  font-size: 20px;
+  font-size: 1.25em;
   margin-top: 10px;
   color: #000000;
 }
+
 .top-bar {
   background-color: #02c2b0;
   position: fixed; 
-  top: 0; /* positions the bar at the very top */
+  top: 0;
   width: 100%;
   height: 50px; 
   display: flex;
   align-items: center; 
   justify-content: center;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* shadow for depth */
-  z-index: 999; /* ensure the bar stays on top */
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); 
+  z-index: 999; 
 }
 
 .source-link {
-  font-size: 20px;
-  color: #000; /* link color */
-  text-decoration: none; /* removes underline */
+  font-size: 1.25em;
+  color: #000;
+  text-decoration: none;
+  padding: 5px 10px;
 }
 
 .source-link:hover {
-  color: #fff; /* color when hovering */
-  text-decoration: underline; /* underline when hovering */
-  font-weight: bold; /* makes the text bold when hovering */
+  color: #fff;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+/* Mobile styles */
+@media screen and (max-width: 600px) {
+  .status {
+    font-size: 1.5em;
+  }
+
+  .character {
+    font-size: 2em;
+  }
+
+  #guess-input, #send-guess {
+    font-size: 1.2em;
+    width: 90%;
+  }
+
+  .incorrect-guesses, .category {
+    font-size: 1.2em;
+  }
+
+  .source-link {
+    font-size: 1em;
+  }
 }
