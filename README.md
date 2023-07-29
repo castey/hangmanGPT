@@ -56,7 +56,7 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 Please make sure to update tests as appropriate.
 
-Authors and acknowledgment
+## Authors and acknowledgment
 Made by castey as a simple demonstration of using Socket.IO and OpenAI's GPT model to create hangman.
 
 Readme mostly written by ChatGPT
