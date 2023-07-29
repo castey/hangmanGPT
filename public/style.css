@@ -31,6 +31,7 @@ html, body {
   border-radius: 5px;
   border: none;
   margin-bottom: 10px;
+  display: none;
 }
 
 #send-guess {
@@ -41,8 +42,9 @@ html, body {
   background-color: #009688;
   color: #ffffff;
   cursor: pointer;
-  width: 80%;
+  width: 100%;
   max-width: 300px;
+  
 }
 
 #send-guess:hover {

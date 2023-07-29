@@ -34,7 +34,7 @@ sendGuessButton.addEventListener('click', () => {
       incorrectGuessDisplay.innerText = '';
       sendGuessButton.innerText = 'Submit Guess';
       doubleCheck = false;
-      socket.emit('send-guess', guessInput.value);
+      socket.emit('send-guess', '');
     }
   }
 
@@ -67,6 +67,7 @@ socket.on('game-over', (data) => {
     sendGuessButton.innerText = 'New Game';
   }
   gameInProgress = false;
+  guessInput.style.display = 'none';
   guessInput.placeholder = "Press enter to start new";
 });
 
@@ -85,6 +86,7 @@ socket.on('category', (data) => {
   categoryDisplay.innerText = 'Category: ' + data;
   guessInput.placeholder = "Guess a letter or phrase";
   gameInProgress = true;
+  guessInput.style.display = 'inline-block';
 });
 
 // update the submit button
