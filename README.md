@@ -1,6 +1,6 @@
 # Hangman Game with OpenAI and Socket.IO
 ## Overview
-This is a simple and interactive Hangman game where the server generates a phrase for the game using OpenAI's API. The game is served over an Express server and uses Socket.IO for real-time, bidirectional and event-based communication.
+This is a simple, interactive hangman game that uses the OpenAI API to generate phrases for the user to guess. The game is served over an Express server and uses Socket.IO for real-time, bidirectional and event-based communication.
 
 The game can be played directly in the browser. The user guesses the letters or the entire phrase, and the game provides real-time feedback about the guesses.
 
@@ -17,7 +17,9 @@ The game can be played directly in the browser. The user guesses the letters or 
 To get started, clone the repository and install the dependencies.
 
 `git clone https://github.com/castey/hangmanGPT.git
+
 cd hangmanGPT
+
 npm install`
 
 Create a .env file in the root directory and add your OpenAI API key.
@@ -57,6 +59,6 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 Please make sure to update tests as appropriate.
 
 ## Authors and acknowledgment
-Made by castey as a simple demonstration of using Socket.IO and OpenAI's GPT model to create hangman.
+Made by castey as a simple demonstration of working with the OpenAI API.
 
-Readme mostly written by ChatGPT
+Readme mostly written by ChatGPT - edited by humans.
