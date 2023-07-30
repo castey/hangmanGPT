@@ -8,6 +8,7 @@ const categoryDisplay = document.getElementById('category-display');
 const sendGuessButton = document.getElementById('send-guess');
 let gameInProgress = false;
 let doubleCheck = false;
+let incorrectGuesses = [];
 
 // detect enter key event
 guessInput.addEventListener('keyup', (event) => {
@@ -71,9 +72,9 @@ socket.on('game-over', (data) => {
   guessInput.placeholder = "Press enter to start new";
 });
 
-// handle incorrect letter guesses
 socket.on('incorrect-guess', (data) => {
-  incorrectGuessDisplay.innerText += data + ', ';
+  incorrectGuesses.push(data);
+  incorrectGuessDisplay.innerText = incorrectGuesses.join(', ');
 });
 
 // handle incorrect phrase guesses
@@ -87,6 +88,7 @@ socket.on('category', (data) => {
   guessInput.placeholder = "Guess a letter or phrase";
   gameInProgress = true;
   guessInput.style.display = 'inline-block';
+  incorrectGuesses = [];
 });
 
 // update the submit button
