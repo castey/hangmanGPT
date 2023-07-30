@@ -17,7 +17,9 @@ The game can be played directly in the browser. The user guesses the letters or 
 To get started, clone the repository and install the dependencies.
 
 `git clone https://github.com/castey/hangmanGPT.git`
+
 `cd hangmanGPT`
+
 `npm install`
 
 Create a .env file in the root directory and add your OpenAI API key.
