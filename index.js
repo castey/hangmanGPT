@@ -1,4 +1,4 @@
-// declare dependencies
+// dependencies
 require('dotenv').config();
 const express = require('express');
 const http = require('http');
@@ -15,7 +15,7 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-// declare function to prompt OpenAI
+// function to prompt OpenAI
 async function newWord(prompt) {
     const response = await openai.createCompletion({
         model: "text-davinci-003",
@@ -23,7 +23,6 @@ async function newWord(prompt) {
         max_tokens: 200,
         temperature: 1,
     });
-
     return response.data.choices[0].text;
 }
 
