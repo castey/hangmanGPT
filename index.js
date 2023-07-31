@@ -1,10 +1,10 @@
 // dependencies
-require('dotenv').config();
+require('dotenv').config(); 
+const myKey = process.env.API_KEY;
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const { Configuration, OpenAIApi } = require("openai");
-const myKey = process.env.API_KEY;
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
@@ -33,7 +33,7 @@ app.use(express.static('public'));
 app.use(express.json());
 
 // delcare categories array
-let categories = [
+const categories = [
     "Before and After", "Song Lyrics", "On the Map", "Living Things", "What Are You Doing?", "Food & Drink", "Same Letter", "Rhyme Time",
     "Historical Events", "Famous People", "Science Terms", "Literary Characters", "Movie Titles", "Sports Teams", "City Landmarks", "Popular TV Shows",
     "Musical Instruments", "Famous Quotes", "Geographical Features", "Historical Figures", "Technology Innovations", "Classic Novels", "Art Movements", "Mythical Creatures",
@@ -55,13 +55,15 @@ const rChar = "-"
 // on user connection
 io.on('connection', (socket) => {
 
-    // declare game state variables 
+    // game state variables
     let hangmanStarted = false;
-    let hangPhrase = '';
-    let hangBlank = '';
     let wrongLetters = [];
     let guessedLetters = [];
+    let hangPhrase = '';
+    let hangBlank = '';
     let category = '';
+
+    console.log(`user ${socket.id} connected`);
 
     // handle user input
     socket.on('send-guess', (userGuess) => {
@@ -72,10 +74,13 @@ io.on('connection', (socket) => {
         //start a new game if user enters nothing
         if (userGuess.length == 0) {
 
-            // start game state variables
-            hangmanStarted = true;
+            // reset game state
+            hangmanStarted = false;
             wrongLetters = [];
             guessedLetters = [];
+            hangPhrase = '';
+            hangBlank = '';
+            category = '';
 
             // pick a random category
             category = categories[Math.floor(Math.random() * categories.length)];
@@ -108,26 +113,33 @@ io.on('connection', (socket) => {
 
             //check if the guess is repeated
             if (guessedLetters.includes(userGuess) || wrongLetters.includes(userGuess)) {
-                socket.emit('repeated-guess', userGuess);
+                // Emit a general repeated-guess event
+
+
+                // Check which array the guess is included in and handle accordingly
+                if (guessedLetters.includes(userGuess)) {
+                    socket.emit('repeated-guess', 'correctly');
+                }
+
+                if (wrongLetters.includes(userGuess)) {
+                    socket.emit('repeated-guess', 'incorrectly');
+                }
             }
+
             //if user guesses a letter correctly and letter has not been guessed
             else if (hangPhrase.includes(userGuess)) {
 
                 //add letter to guessed letters array
                 guessedLetters.push(userGuess);
 
-                //remove dashes for every guessed letter
-                let regexStr = `[^ ${guessedLetters.join('')}]`;
-                let regex = new RegExp(regexStr, 'g');
-
                 //replace the displayed word with the guesses filled in
-                hangBlank = hangPhrase.replace(regex, rChar);
+                hangBlank = hangPhrase.replace(new RegExp(`[^ ${guessedLetters.join('')}]`, 'g'), rChar);
 
                 socket.emit('update-character', hangBlank);
             }
             //if user guesses a letter incorrectly
             else {
-                
+
                 // add guess to list of wrong letters guessed
                 wrongLetters.push(userGuess);
                 socket.emit('incorrect-guess', userGuess);
@@ -136,14 +148,9 @@ io.on('connection', (socket) => {
                 if (wrongLetters.length >= 7) {
 
                     // send loss event
-                    socket.emit('game-over', { result: 'lose' });
-
-                    // Reset game state
-                    hangmanStarted = false; 
-                    wrongLetters = [];
-                    guessedLetters = [];
+                    socket.emit('game-over', 'lose');
                     hangPhrase = '';
-                    hangBlank = '';
+
                 }
             }
         }
@@ -154,28 +161,26 @@ io.on('connection', (socket) => {
             // check if guess matches the phrase
             if (userGuess.toLowerCase() === hangPhrase) {
 
-                // reset game state 
-                hangmanStarted = false;
-                wrongLetters = [];
-                guessedLetters = [];
-                hangBlank = hangPhrase; // The guess is correct so the blank will now be filled with the complete word.
+                // fill in clue
+                hangBlank = hangPhrase;
 
                 // Emit the updated hangBlank.
-                socket.emit('update-character', hangBlank); 
+                socket.emit('update-character', hangBlank);
 
                 // Emit another event here to indicate that the game has ended.
-                socket.emit('game-over', { result: 'win' });
-
-                // Reset game state
-                wrongLetters = [];
-                guessedLetters = [];
+                socket.emit('game-over', 'win' );
+                
                 hangPhrase = '';
-                hangBlank = '';
+
             } else {
                 // If guess is incorrect, you might want to emit an event.
                 socket.emit('incorrect-word-guess', userGuess);
             }
         }
+    });
+
+    socket.on("disconnect", (reason) => {
+        console.log(`user ${socket.id} disconnected! ${reason}`);
     });
 });
 

@@ -60,10 +60,10 @@ socket.on('update-character', (data) => {
 
 // handle game over event
 socket.on('game-over', (data) => {
-  if (data.result === 'win') {
+  if (data == 'win') {
     statusDisplay.innerText = 'You won!';
     sendGuessButton.innerText = 'New Game';
-  } else if (data.result === 'lose') {
+  } else if (data == 'lose') {
     statusDisplay.innerText = 'You lost!';
     sendGuessButton.innerText = 'New Game';
   }
@@ -89,6 +89,10 @@ socket.on('category', (data) => {
   gameInProgress = true;
   guessInput.style.display = 'inline-block';
   incorrectGuesses = [];
+});
+
+socket.on('repeated-guess', (data) => {
+  statusDisplay.innerText = `You already guessed that letter ${data}`;
 });
 
 // update the submit button
