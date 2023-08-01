@@ -1,6 +1,7 @@
 // declare constants
 const socket = io.connect();
 const guessInput = document.getElementById('guess-input');
+const copyButton = document.getElementById('copy');
 const characterDisplay = document.getElementById('character-display');
 const statusDisplay = document.getElementById('status-display');
 const incorrectGuessDisplay = document.getElementById('incorrect-guess-display');
@@ -9,12 +10,17 @@ const sendGuessButton = document.getElementById('send-guess');
 let gameInProgress = false;
 let doubleCheck = false;
 let incorrectGuesses = [];
+let clue = '';
 
 // detect enter key event
 addEventListener('keyup', (event) => {
   if (event.key === 'Enter') {
     sendGuessButton.click();
   }
+});
+
+copyButton.addEventListener('click', () =>{
+  guessInput.value = clue;
 });
 
 // detect click event
@@ -56,6 +62,7 @@ sendGuessButton.addEventListener('click', () => {
 // update the clue
 socket.on('update-character', (data) => {
   characterDisplay.innerText = data;
+  clue = data;
 });
 
 // handle game over event
@@ -69,6 +76,7 @@ socket.on('game-over', (data) => {
   }
   gameInProgress = false;
   guessInput.style.display = 'none';
+  copyButton.style.display = "none";
   guessInput.placeholder = "Press enter to start new";
 });
 
@@ -89,6 +97,8 @@ socket.on('category', (data) => {
   gameInProgress = true;
   guessInput.style.display = 'inline-block';
   incorrectGuesses = [];
+  guessInput.focus();
+  copyButton.style.display = "inline-block";
 });
 
 socket.on('repeated-guess', (data) => {
@@ -97,6 +107,7 @@ socket.on('repeated-guess', (data) => {
 
 socket.on('reset-state', () => {
   guessInput.style.display = 'none';
+  copyButton.style.display = "none";
   categoryDisplay.innerText = '';
   incorrectGuessDisplay.innerText = '';
   characterDisplay.innerText = '';

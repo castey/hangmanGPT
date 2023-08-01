@@ -34,6 +34,18 @@ html, body {
   display: none;
 }
 
+#copy{
+  height: 30px;
+  width: 46px;
+  background-color: #009688;
+  color: white;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  margin: 5px;
+  display: none;
+}
+
 #send-guess {
   font-size: 1.5em;
   padding: 10px 20px;
