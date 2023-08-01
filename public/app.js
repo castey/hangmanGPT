@@ -11,7 +11,7 @@ let doubleCheck = false;
 let incorrectGuesses = [];
 
 // detect enter key event
-guessInput.addEventListener('keyup', (event) => {
+addEventListener('keyup', (event) => {
   if (event.key === 'Enter') {
     sendGuessButton.click();
   }
