@@ -95,6 +95,13 @@ socket.on('repeated-guess', (data) => {
   statusDisplay.innerText = `You already guessed that letter ${data}`;
 });
 
+socket.on('reset-state', () => {
+  guessInput.style.display = 'none';
+  categoryDisplay.innerText = '';
+  incorrectGuessDisplay.innerText = '';
+  characterDisplay.innerText = '';
+});
+
 // update the submit button
 setInterval(() => {
   if (guessInput.value.length === 0) {

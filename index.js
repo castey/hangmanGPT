@@ -3,7 +3,7 @@ require('dotenv').config();
 const myKey = process.env.API_KEY;
 const express = require('express');
 const http = require('http');
-const socketIo = require('socket.io');
+const socketIo = require('socket.io')
 const { Configuration, OpenAIApi } = require("openai");
 const app = express();
 const server = http.createServer(app);
@@ -55,6 +55,9 @@ const rChar = "-"
 // on user connection
 io.on('connection', (socket) => {
 
+    // send reset event
+    socket.emit('reset-state');
+
     // game state variables
     let hangmanStarted = false;
     let wrongLetters = [];
@@ -87,7 +90,7 @@ io.on('connection', (socket) => {
 
             // generate phrase using OpenAI
             newWord(`Generate a challenging yet realistic phrase for a game of Hangman, using words related to the category '${category}'. The phrase should be composed of valid English words, separated by spaces. No nonsense words. For instance, if the category was 'music', a suitable output might be 'JAZZ QUARTET PERFORMANCE'`).then((ret) => {
-                if (!ret) throw new Error("OpenAI error")
+                if (!ret) console.log("OpenAI error!");
 
                 // format the phrase to lowercase, replace non letters and duplicate/trailing spaces
                 hangPhrase = ret.toLowerCase().replace(/[^a-z ]+| {2,}/g, " ").trim();
