@@ -100,6 +100,7 @@ socket.on('reset-state', () => {
   categoryDisplay.innerText = '';
   incorrectGuessDisplay.innerText = '';
   characterDisplay.innerText = '';
+  doubleCheck = true;
 });
 
 // update the submit button
