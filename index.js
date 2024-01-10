@@ -17,7 +17,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 // function to prompt OpenAI
-async function simpleBot(prompt, tokens, temperature) {
+async function newWord(prompt, tokens, temperature) {
 
     promptArray = [{ role: "system", content: "follow the instruction" },
     { role: "user", content: prompt }]
