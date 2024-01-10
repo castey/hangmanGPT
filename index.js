@@ -1,5 +1,5 @@
 // dependencies
-require('dotenv').config(); 
+require('dotenv').config();
 const myKey = process.env.API_KEY;
 const express = require('express');
 const http = require('http');
@@ -17,14 +17,21 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 // function to prompt OpenAI
-async function newWord(prompt) {
-    const response = await openai.createCompletion({
-        model: "text-davinci-003",
-        prompt: prompt,
-        max_tokens: 200,
-        temperature: 1,
+async function simpleBot(prompt, tokens, temperature) {
+
+    promptArray = [{ role: "system", content: "follow the instruction" },
+    { role: "user", content: prompt }]
+
+    const response = await openai.createChatCompletion({
+        model: "gpt-4",
+        messages: promptArray,
+        max_tokens: tokens,
+        temperature: temperature,
     });
-    return response.data.choices[0].text;
+
+
+    return response.data.choices[0].message.content;
+
 }
 
 // serve public folder
@@ -76,7 +83,7 @@ io.on('connection', (socket) => {
             category = categories[Math.floor(Math.random() * categories.length)];
 
             // generate phrase using OpenAI
-            newWord(`Generate a challenging yet realistic phrase for a game of Hangman, using words related to the category '${category}'. The phrase should be composed of valid English words, separated by spaces. No nonsense words. For instance, if the category was 'music', a suitable output might be 'JAZZ QUARTET PERFORMANCE'`).then((ret) => {
+            newWord(`Generate a moderately challenging realistic phrase for a game of Hangman, using words in the category '${category}'. The phrase should be composed of valid English words, separated by spaces and must be a real phrase known by a group of people. No nonsense phrases. For instance, if the category was 'music', a suitable output might be 'JAZZ QUARTET PERFORMANCE'`, 180, 0.96).then((ret) => {
                 if (!ret) console.log("OpenAI error!");
 
                 // format the phrase to lowercase, replace non letters and duplicate/trailing spaces
@@ -158,8 +165,8 @@ io.on('connection', (socket) => {
                 socket.emit('update-character', hangBlank);
 
                 // Emit another event here to indicate that the game has ended.
-                socket.emit('game-over', 'win' );
-                
+                socket.emit('game-over', 'win');
+
                 hangPhrase = '';
 
             } else {
